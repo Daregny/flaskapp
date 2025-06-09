@@ -1,0 +1,45 @@
+# Ignorar diretórios específicos do projeto
+app/output/*
+app/uploads/*
+app/extra/*
+
+# Manter os diretórios vazios com um .gitkeep
+!app/output/.gitkeep
+!app/uploads/.gitkeep
+!app/extra/.gitkeep
+
+# Python
+__pycache__/*
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/*
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environment
+venv/
+ENV/
+.env
+.venv
+
+# IDEs e editores
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store

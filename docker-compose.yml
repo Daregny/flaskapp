@@ -1,0 +1,14 @@
+version: '3.7'
+
+services:
+  flaskapp:
+    build: .
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./app/uploads:/app/app/uploads
+      - ./app/output:/app/app/output
+      - ./app/extra:/app/app/extra
+    environment:
+      - FLASK_ENV=production
+    restart: unless-stopped

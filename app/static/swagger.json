@@ -1,0 +1,46 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Conversor DOC para PDF API",
+    "description": "API para conversão de arquivos DOC/DOCX para PDF usando LibreOffice",
+    "version": "1.0"
+  },
+  "basePath": "/api/v1",
+  "schemes": [
+    "http"
+  ],
+  "paths": {
+    "/convert": {
+      "post": {
+        "tags": ["Conversão"],
+        "summary": "Converte arquivo DOC/DOCX para PDF",
+        "consumes": ["multipart/form-data"],
+        "parameters": [
+          {
+            "name": "file",
+            "in": "formData",
+            "description": "Arquivo DOC/DOCX para converter",
+            "required": true,
+            "type": "file"
+          },
+          {
+            "name": "output_type",
+            "in": "formData",
+            "description": "Tipo de saída desejado (download, base64)",
+            "required": true,
+            "type": "string",
+            "enum": ["download", "base64"]
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Conversão realizada com sucesso"
+          },
+          "400": {
+            "description": "Erro na requisição"
+          }
+        }
+      }
+    }
+  }
+}
