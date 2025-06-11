@@ -6,7 +6,7 @@ import base64
 from werkzeug.utils import secure_filename
 
 UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'uploads')
-OUTPUT_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'output')
+OUTPUT_FOLDER = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(__file__)), 'output'))
 LIBREOFFICE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'extra', 'LibreOffice-fresh.standard-x86_64.AppImage')
 ALLOWED_EXTENSIONS = {'doc', 'docx'}
 
@@ -34,6 +34,10 @@ class ConvertToPDF(Resource):
     def post(self):
         # Limpa os diretórios antes de iniciar uma nova conversão
         cleanup_directories()
+
+        # Garante que os diretórios existem
+        os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+        os.makedirs(OUTPUT_FOLDER, exist_ok=True)
         
         if 'file' not in request.files:
             return {'error': 'Nenhum arquivo enviado'}, 400

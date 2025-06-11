@@ -1,109 +1,75 @@
-# Conversor DOC para PDF API
+# FlaskApp - Conversor de DOC/DOCX para PDF
 
-API REST desenvolvida com Flask para converter arquivos DOC/DOCX para PDF utilizando LibreOffice.
+Este projeto é uma API Flask para converter arquivos `.doc` e `.docx` em PDF, utilizando o LibreOffice AppImage em ambiente Docker.
 
-## Descrição
+## Pré-requisitos
 
-Esta API permite converter arquivos do Microsoft Word (DOC/DOCX) para PDF utilizando o LibreOffice em modo headless. A API oferece duas opções de retorno:
-- Download direto do arquivo PDF
-- Retorno do arquivo em formato Base64
-
-## Requisitos
-
-- Docker 19.03 ou superior
-- Docker Compose
+- [Docker](https://docs.docker.com/get-docker/) instalado
+- (Opcional) [Docker Compose](https://docs.docker.com/compose/) instalado
 
 ## Estrutura do Projeto
 
 ```
-.
+flaskapp/
 ├── app/
-│   ├── extra/              # Contém o LibreOffice AppImage
-│   ├── output/             # Diretório para arquivos PDF convertidos
-│   ├── uploads/            # Diretório para arquivos DOC/DOCX temporários
-│   ├── static/            
-│   │   └── swagger.json    # Documentação da API
-│   ├── __init__.py        # Configuração do Flask
-│   └── routes.py          # Rotas e lógica da API
-├── docker-compose.yml      # Configuração do Docker Compose
-├── Dockerfile             # Configuração do container
-├── requirements.txt       # Dependências Python
-└── run.py                # Arquivo principal para execução
+│   ├── routes.py
+│   ├── uploads/
+│   ├── output/
+│   └── extra/
+│       └── LibreOffice-fresh.standard-x86_64.AppImage
+├── requirements.txt
+├── run.py
+└── Dockerfile
 ```
 
-## Como Executar
+## Como usar
 
-1. Clone o repositório:
-```bash
-git clone <repositório>
-cd flaskapp
+### 1. Coloque o AppImage do LibreOffice
+
+Baixe o arquivo `LibreOffice-fresh.standard-x86_64.AppImage` e coloque em `app/extra/`.
+
+### 2. Build da imagem Docker
+
+```sh
+docker build -t flaskapp .
 ```
 
-2. Coloque o arquivo LibreOffice AppImage na pasta `app/extra/`:
-```bash
-# Certifique-se que o arquivo está nomeado como:
-LibreOffice-fresh.standard-x86_64.AppImage
+### 3. Execute o container
+
+```sh
+docker run --rm -p 5000:5000 flaskapp
 ```
 
-3. Construa e inicie o container:
-```bash
-docker-compose up --build
-```
+> **Se usar AppImage e der erro de FUSE, rode com:**
+> 
+> ```sh
+> docker run --rm --device /dev/fuse --cap-add SYS_ADMIN --security-opt apparmor:unconfined -p 5000:5000 flaskapp
+> ```
 
-4. A API estará disponível em:
-```
-http://localhost:5000
-```
+### 4. Faça requisições para a API
 
-## Documentação da API
+- **Endpoint:** `POST /convert`
+- **Form-data:**
+  - `file`: arquivo `.doc` ou `.docx`
+  - `output_type`: `download` ou `base64` (opcional, padrão: `url`)
 
-A documentação Swagger UI está disponível em:
-```
-http://localhost:5000/api/docs
-```
+#### Exemplo usando `curl`:
 
-### Endpoint
-
-`POST /api/v1/convert`
-
-#### Parâmetros
-
-- `file`: Arquivo DOC/DOCX para converter (required)
-- `output_type`: Tipo de saída desejado (required)
-  - `download`: Download direto do PDF
-  - `base64`: Retorno do PDF em base64
-
-## Volumes Docker
-
-O projeto utiliza três volumes Docker:
-- `./app/uploads`: Para arquivos temporários
-- `./app/output`: Para arquivos convertidos
-- `./app/extra`: Para o LibreOffice AppImage
-
-## Ambiente de Desenvolvimento
-
-Para desenvolvimento local sem Docker:
-
-1. Crie um ambiente virtual:
-```bash
-python -m venv env
-source env/bin/activate  # Linux/Mac
-# ou
-env\Scripts\activate  # Windows
-```
-
-2. Instale as dependências:
-```bash
-pip install -r requirements.txt
-```
-
-3. Execute a aplicação:
-```bash
-python run.py
+```sh
+curl -F "file=@seuarquivo.docx" -F "output_type=base64" http://localhost:5000/convert
 ```
 
 ## Observações
 
-- Os diretórios de upload e output são limpos automaticamente antes de cada nova conversão
-- O LibreOffice é executado em modo headless para otimizar o uso de recursos
-- A API utiliza CORS para permitir requisições de diferentes origens
+- Os arquivos enviados são salvos em `/app/uploads` e os PDFs gerados em `/app/output` dentro do container.
+- O diretório de saída é limpo a cada nova conversão.
+- O retorno pode ser o arquivo para download ou o PDF em base64.
+
+## Possíveis erros
+
+- **FUSE/AppImage:** Se houver erro ao montar o AppImage, rode o container com permissões extras (veja acima).
+- **Dependências:** O Dockerfile já instala as bibliotecas necessárias para o LibreOffice funcionar.
+
+## Licença
+
+MIT
